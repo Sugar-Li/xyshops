@@ -4,23 +4,23 @@
     <section class="profile">
       <HeaderTop title="我的"></HeaderTop>
       <section class="profile-number">
-        <a href="javascript:" class="profile-link">
+        <router-link class="profile-link" :to="userInfo?'/userInfo':'/login'">
           <div class="profile_image">
             <i class="iconfont icon-person"></i>
           </div>
           <div class="user-info">
-            <p class="user-info-top">登录/注册</p>
+            <p class="user-info-top" v-if="!userInfo.phone">{{userInfo.name||'登录/注册'}}</p>
             <p>
                 <span class="user-icon">
                   <i class="iconfont icon-shouji icon-mobile"></i>
                 </span>
-              <span class="icon-mobile-number">暂无绑定手机号</span>
+              <span class="icon-mobile-number">{{userInfo.phone||'暂无绑定手机号'}}</span>
             </p>
           </div>
           <span class="arrow">
               <i class="iconfont icon-jiantou1"></i>
             </span>
-        </a>
+        </router-link>
       </section>
       <section class="profile_info_data border-1px">
         <ul class="info_data_list">
@@ -90,15 +90,40 @@
           </div>
         </a>
       </section>
+      <section class="profile_my_order border-1px">
+        <mt-button type="danger" style="width: 100%" @click="logout">退出</mt-button>
+      </section>
+
     </section>
   </div>
 </template>
 
 <script>
   import HeaderTop from '../../components/HeaderTop/HeaderTop.vue'
+  import {mapState} from 'vuex'
+  import {MessageBox,Toast} from 'mint-ui'
+
+
   export default {
-    components:{
+    computed: {
+      ...mapState(['userInfo'])
+    },
+    components: {
       HeaderTop
+    },
+    methods: {
+      logout() {
+        MessageBox.confirm('是否确认退出？').then(
+          action => {
+          //确认退出
+            this.$store.dispatch('logout')
+            Toast('登出成功')
+          },
+          action => {
+            console.log('取消退出')
+          }
+        )
+      }
     }
   }
 </script>
@@ -106,6 +131,7 @@
 <style lang="stylus" rel="stylesheet/stylus">
   @import '../../common/stylus/mixins.styl'
   &.profile //我的
+    overflow hidden
     width 100%
     .profile-number
       margin-top 45.5px
@@ -203,12 +229,12 @@
         display flex
         align-items center
         padding-left 15px
-        >span
+        > span
           display flex
           align-items center
           width 20px
           height 20px
-          >.iconfont
+          > .iconfont
             margin-left -10px
             font-size 30px
           .icon-order-s
